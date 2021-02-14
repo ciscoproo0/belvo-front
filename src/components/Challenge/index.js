@@ -5,6 +5,11 @@ import { Container } from './styles';
 
 function Challenge({ handleChallenge, challengeValue, setChallengeValue }) {
 
+const emitToParent = () => {
+    handleChallenge();
+    setChallengeValue('');
+}
+
   return (
         <Container>
             <strong>A challenge code is required to retrieve Owners data</strong>
@@ -14,9 +19,9 @@ function Challenge({ handleChallenge, challengeValue, setChallengeValue }) {
                     placeholder="******" 
                     value={challengeValue} 
                     onChange={(event) => setChallengeValue(event.target.value)}
-                    onKeyPress={(event) => { event.key === 'Enter' && handleChallenge()}}
+                    onKeyPress={(event) => { event.key === 'Enter' && emitToParent()}}
                 />
-                <button type="button" onClick={() => handleChallenge()}><span>Challenge</span></button>
+                <button type="button" onClick={() => emitToParent()}><span>Challenge</span></button>
             </div>
         </Container>
     );

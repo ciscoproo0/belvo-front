@@ -9,24 +9,25 @@ import Balances from '../../components/Balances';
 import Control from '../../components/Control';
 
 
-function Dashboard({ location: { state } }) {
+function Dashboard({ location: { state }}) {
+  const { link_id, live } = state;
 
   useEffect(() => {
   }, [])
   return (
       <Container>
         <Head>
-          <Control link_id={state}></Control>
+          <Control link_id={link_id} live={live}></Control>
         </Head>
         <GeneralInfo>
-          <Owners link_id={state}></Owners>
-          <Accounts link_id={state}></Accounts>
+          <Owners link_id={link_id} live={live}></Owners>
+          <Accounts link_id={link_id} live={live}></Accounts>
         </GeneralInfo>
         <BalanceInfo>
-          <Balances link_id={state}></Balances>
+          <Balances link_id={link_id} live={live}></Balances>
         </BalanceInfo>
         <TransactionInfo>
-          <Transactions link_id={state}></Transactions>
+          <Transactions link_id={link_id} live={live}></Transactions>
         </TransactionInfo>
       </Container>
   );

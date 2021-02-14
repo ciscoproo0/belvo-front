@@ -5,11 +5,11 @@ import history from '../../services/history'
 
 import { Container } from './styles';
 
-function Control({link_id}) {
+function Control({ link_id, live }) {
 const destroyLink = async () => {
     await api.delete(
         `/links/destroy/${link_id}`, 
-        { headers: { mode: 'sandbox' } }
+        { headers: { mode: !live ? 'sandbox' : 'live' } }
     );
 
     history.push('/');

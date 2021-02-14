@@ -34,7 +34,7 @@ function Link() {
 
           //belvo lib
           function onEventCallbackFunction(data) {
-            // Do something with the event data
+            console.log(data);
           }
 
           function onExitCallbackFunction(data) {
@@ -48,7 +48,7 @@ function Link() {
                     institution
                 });
                 
-                history.push({ pathname: '/dashboard', state: link_id })
+                history.push({ pathname: '/dashboard', state: { link_id, live } })
             }
           function openBelvoWidget() {
             // call the server to generate an access token to start the widget

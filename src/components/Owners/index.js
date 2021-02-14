@@ -6,7 +6,7 @@ import { Container, Title, Items, Value } from './styles';
 import Challenge from '../Challenge';
 
 
-function Owners({link_id}) {
+function Owners({ link_id, live }) {
 const [owners, setOwners] = useState([]);
 const [needChallenge, setNeedChallenge] = useState(false);
 const [challengeValue, setChallengeValue] = useState('');
@@ -17,10 +17,10 @@ const retrieveOwners = async () => {
         const responseRetrieve = await api.post(
             `/owners/retrieve/`, 
             { link: link_id },
-            { headers: { mode: 'sandbox' } }
+            { headers: { mode: !live ? 'sandbox' : 'live' } }
         );
         
-        setOwners(responseRetrieve.data);
+        setOwners(responseRetrieve.data.results ? responseRetrieve.data.results : responseRetrieve.data);
 
     } catch(err){
         if(err.response.status === 428){
@@ -29,10 +29,10 @@ const retrieveOwners = async () => {
             setSession(err.response.data[0].session);
         }else{
             alert('Cannot load data from Owners');
+            console.log(err);
         }
     }
 }
-
 
 const handleChallenge = async () => {
     try {
@@ -43,23 +43,25 @@ const handleChallenge = async () => {
                 token: challengeValue,
                 link: link_id,
              },
-             { headers: { mode: "sandbox" } }
+             { headers: { mode: !live ? 'sandbox' : 'live' } }
         );
 
-        setOwners(responseChallenge.data);
+        setOwners(responseChallenge.data.results ? responseChallenge.data.results : responseChallenge.data);
+        setNeedChallenge(!needChallenge)
     } catch(err){
         if(err.response.status === 428){
             console.log("needs challenge code");
             setNeedChallenge(!needChallenge);
         }else{
             alert('Cannot load data from Owners');
+            console.log(err);
         }
     }
 }
 
 useEffect(() => {
     retrieveOwners();
-}, [owners])
+}, [])
 
   return (
       <Container>

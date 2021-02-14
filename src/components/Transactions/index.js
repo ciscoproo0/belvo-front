@@ -2,35 +2,41 @@ import React, { useEffect, useState } from 'react';
 
 import { api } from '../../services/api';
 
-import { Container, Title, Table, Wrap } from './styles';
+import { Container, DateRange, Title, Table, Wrap } from './styles';
 import Challenge from '../Challenge';
 
-function Transactions({link_id}) {
+function Transactions({ link_id, live }) {
 const [transactions, setTransactions] = useState([]);
 const [needChallenge, setNeedChallenge] = useState(false);
 const [challengeValue, setChallengeValue] = useState('');
 const [session, setSession] = useState('');
+const [dateFrom, setDateFrom] = useState('2021-01-01');
+const [dateTo, setDateTo] = useState('2021-01-01');
 
 const retrieveTransactions = async () => {
+    let parseDateFrom = new Date(dateFrom).toISOString();
+    let parseDateTo = new Date(dateTo).toISOString();
     try {
     const responseRetrieve = await api.post(
         `/transactions/retrieve/`, 
         { 
             link: link_id,
-            date_from: "2021-01-01",
-            date_to: "2021-01-02"
+            date_from: parseDateFrom.split("T")[0],
+            date_to: parseDateTo.split("T")[0]
         },
-        { headers: { mode: 'sandbox' } }
+        { headers: { mode: !live ? 'sandbox' : 'live' } }
     );
 
-    setTransactions(responseRetrieve.data);
+    setTransactions(responseRetrieve.data.results ? responseRetrieve.data.results : responseRetrieve.data);
+    setNeedChallenge(false);
     } catch(err){
         if(err.response.status === 428){
             console.log("needs challenge code");
-            setNeedChallenge(!needChallenge);
+            setNeedChallenge(true);
             setSession(err.response.data[0].session);
         }else{
             alert('Cannot load data from Transactions');
+            console.log(err);
         }
     }    
 }
@@ -44,30 +50,51 @@ const handleChallenge = async () => {
                 token: challengeValue,
                 link: link_id,
              },
-             { headers: { mode: "sandbox" } }
+             { headers: { mode: !live ? 'sandbox' : 'live' } }
         );
 
-        setTransactions(responseChallenge.data);
+        setTransactions(responseChallenge.data.results ? responseChallenge.data.results : responseChallenge.data);
+        setNeedChallenge(false)
     } catch(err){
         if(err.response.status === 428){
             console.log("needs challenge code");
-            setNeedChallenge(!needChallenge);
+            setNeedChallenge(true);
         }else{
             alert('Cannot load data from Transactions');
+            console.log(err);
         }
     }
 }
 
 useEffect(() => {
     retrieveTransactions();
-}, [transactions])
+}, [dateTo])
 
   return (
       <Container>
         <Title>
+            <DateRange>
+                <label><span>From:</span>
+                    <input 
+                        type="date"
+                        placeholder="01-01-2021"
+                        value={dateFrom}
+                        onChange={(event) => setDateFrom(event.target.value)}    
+                    />
+                </label>
+                <label><span>to:</span>
+                    <input 
+                        type="date"
+                        placeholder="01-01-2021"
+                        value={dateTo}
+                        onChange={(event) => { setDateTo(event.target.value); setNeedChallenge(!needChallenge) }} 
+                    />
+                </label>
+            </DateRange>
             <strong>Transaction Info</strong>
         </Title>
-            {!needChallenge ? (        <Table>
+            {!needChallenge ? (       
+        <Table>
             <thead>
               <tr>
                 <th>Account Name</th>

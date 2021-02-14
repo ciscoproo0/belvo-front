@@ -5,7 +5,7 @@ import { api } from '../../services/api';
 import { Container, Title, Account, Items, Value } from './styles';
 import Challenge from '../Challenge';
 
-function Accounts({link_id}) {
+function Accounts({ link_id, live }) {
 const [accounts, setAccounts] = useState([]);
 const [needChallenge, setNeedChallenge] = useState(false);
 const [challengeValue, setChallengeValue] = useState('');
@@ -15,11 +15,11 @@ const retrieveAccounts = async () => {
     try {
         const responseRetrieve = await api.post(
             `/accounts/retrieve/`, 
-            { link: link_id},
-            { headers: { mode: 'sandbox' } }
+            { link: link_id },
+            { headers: { mode: !live ? 'sandbox' : 'live' } }
         );
 
-        setAccounts(responseRetrieve.data);
+        setAccounts(responseRetrieve.data.results ? responseRetrieve.data.results : responseRetrieve.data);
         
     } catch(err){
         if(err.response.status === 428){
@@ -28,6 +28,7 @@ const retrieveAccounts = async () => {
             setSession(err.response.data[0].session);
         }else{
             alert('Cannot load data from Accounts');
+            console.log(err);
         }
     }
 }
@@ -41,24 +42,25 @@ const handleChallenge = async () => {
                 token: challengeValue,
                 link: link_id,
              },
-             { headers: { mode: "sandbox" } }
+             { headers: { mode: !live ? 'sandbox' : 'live' } }
         );
 
-        setAccounts(responseChallenge.data);
-        console.log(responseChallenge.data)
+        setAccounts(responseChallenge.data.results ? responseChallenge.data.results : responseChallenge.data);
+        setNeedChallenge(!needChallenge)
     } catch(err){
         if(err.response.status === 428){
             console.log("needs challenge code");
             setNeedChallenge(!needChallenge);
         }else{
             alert('Cannot load data from Accounts');
+            console.log(err);
         }
     }
 }
 
 useEffect(() => {
     retrieveAccounts();
-}, [accounts])
+}, [])
   return (
     <Container>
         <Items toggle={needChallenge}>
