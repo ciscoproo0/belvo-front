@@ -7,6 +7,8 @@ This is a playground project to test Belvo APIs. The usage it is pretty simple, 
 
 Do not forget that this front-end needs a functional backend. You can consume my endpoints in: https://belvo-api.herokuapp.com (you can change it in /src/services/api.js). Or you can just download the project: https://github.com/ciscoproo0/belvo-api and run locally with your own credentials!
 
+Here is the live demo: https://belvo-front.herokuapp.com/
+
 ---
 
 #### Try it for yourself
